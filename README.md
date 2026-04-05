@@ -62,6 +62,8 @@ endif()
 经典的你是谁的问题，模型[Meta-Llama-3-8B-Instruct-Q4_K_M.gguf](https://cdn-lfs-cn-1.modelscope.cn/prod/lfs-objects/57/b2/6bac2df51111affec600077708de06133b8f49e697723672657c7cbe3b9c?filename=Meta-Llama-3-8B-Instruct-Q4_K_M.gguf&namespace=LLM-Research&repository=Meta-Llama-3-8B-Instruct-GGUF&revision=master&tag=model&auth_key=1775398751-ea36bac316f34073b0781529ab3b56db-0-9ca29a20fb3134cfadad1a96182ab2ff)用命令```./bin/llama-server -m /home/pnxc/下载/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf --port 8080```推理了4分钟，推理速度是0.83t/s。
 用命令```./bin/llama-server -m /data/home/pnxc/下载/gemma-4-E2B-it-UD-Q4_K_XL.gguf --port 8080```换成模型[gemma-4-E2B-it-UD-Q4_K_XL.gguf](https://cdn-lfs-cn-1.modelscope.cn/prod/lfs-objects/41/96/91b8dd007300fe1e9706a01c3400296043e94753fda8556121bab943530f?filename=gemma-4-E2B-it-UD-Q4_K_XL.gguf&namespace=unsloth&repository=gemma-4-E2B-it-GGUF&revision=master&tag=model&auth_key=1775397519-4be3b77b78ee4d1e855db1ddd4722271-0-8bee2fb4ab1a0a2611849c4f88fc9d6a)会出现思维链，思维链的推理速度是0.96t/s
 <img width="924" height="909" alt="image" src="https://github.com/user-attachments/assets/1104e9e5-fc52-4db4-ae96-4ab8da39757a" />
+启动命令加上```--chat-template-kwargs '{"enable_thinking": false}'```关闭思维链后，推理速度是2.21t/s
+<img width="941" height="464" alt="image" src="https://github.com/user-attachments/assets/7ed2b5a8-c962-49a5-bd5d-2d28e2428eb1" />
 
 
 > [!IMPORTANT]
