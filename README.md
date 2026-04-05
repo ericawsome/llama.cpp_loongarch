@@ -9,6 +9,60 @@
 [Roadmap](https://github.com/users/ggerganov/projects/7) / [Project status](https://github.com/ggerganov/llama.cpp/discussions/3471) / [Manifesto](https://github.com/ggerganov/llama.cpp/discussions/205) / [ggml](https://github.com/ggerganov/ggml)
 
 Inference of Meta's [LLaMA](https://arxiv.org/abs/2302.13971) model (and others) in pure C/C++
+> [Log]
+- 3A5000上用的daoxiagnhu20操作系统，安装的是g++ (Loongnix 8.3.0-6.lnd.vec.44) 8.3.0，编译用CMake 3.24.3版，编译成功，加载运行模型[Meta-Llama-3-8B-Instruct-Q4_K_M.gguf](https://cdn-lfs-cn-1.modelscope.cn/prod/lfs-objects/57/b2/6bac2df51111affec600077708de06133b8f49e697723672657c7cbe3b9c?filename=Meta-Llama-3-8B-Instruct-Q4_K_M.gguf&namespace=LLM-Research&repository=Meta-Llama-3-8B-Instruct-GGUF&revision=master&tag=model&auth_key=1775398751-ea36bac316f34073b0781529ab3b56db-0-9ca29a20fb3134cfadad1a96182ab2ff)成功，用命令```./bin/llama-server -m /home/pnxc/下载/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf --port 8080```启动推理速度很慢而且会卡死。2026.04.05
+- 尝试编译最新的[llama.cpp-b8665](https://github.com/ggml-org/llama.cpp/archive/refs/tags/b8665.tar.gz)，需要修改CMakeList.txt的第191行代码加入以下内容
+```
+# Fix std::filesystem linking for GCC < 9 (needed for loongarch with GCC 8.3)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0")
+    message(STATUS "Linking stdc++fs to ggml targets for GCC < 9.0")
+    foreach(target IN ITEMS ggml ggml-base ggml-cpu)
+        if(TARGET ${target})
+            target_link_libraries(${target} PUBLIC stdc++fs)
+        endif()
+    endforeach()
+endif()
+```
+  修改完后从177行到206行的内容如下：
+```
+#
+# 3rd-party
+#
+
+if (LLAMA_USE_SYSTEM_GGML)
+    message(STATUS "Using system-provided libggml, skipping ggml build")
+    find_package(ggml REQUIRED)
+    add_library(ggml ALIAS ggml::ggml)
+endif()
+
+if (NOT TARGET ggml AND NOT LLAMA_USE_SYSTEM_GGML)
+    set(GGML_BUILD_NUMBER ${LLAMA_BUILD_NUMBER})
+    set(GGML_BUILD_COMMIT ${LLAMA_BUILD_COMMIT})
+    add_subdirectory(ggml)
+
+# Fix std::filesystem linking for GCC < 9 (needed for loongarch with GCC 8.3)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "9.0")
+    message(STATUS "Linking stdc++fs to ggml targets for GCC < 9.0")
+    foreach(target IN ITEMS ggml ggml-base ggml-cpu)
+        if(TARGET ${target})
+            target_link_libraries(${target} PUBLIC stdc++fs)
+        endif()
+    endforeach()
+endif()
+    # ... otherwise assume ggml is added by a parent CMakeLists.txt
+endif()
+
+#
+# build the library
+#
+```
+<img width="897" height="852" alt="image" src="https://github.com/user-attachments/assets/d7f4025b-fd11-4b7e-ac65-184a84e9f72b" />
+
+
+经典的你是谁的问题，模型[Meta-Llama-3-8B-Instruct-Q4_K_M.gguf](https://cdn-lfs-cn-1.modelscope.cn/prod/lfs-objects/57/b2/6bac2df51111affec600077708de06133b8f49e697723672657c7cbe3b9c?filename=Meta-Llama-3-8B-Instruct-Q4_K_M.gguf&namespace=LLM-Research&repository=Meta-Llama-3-8B-Instruct-GGUF&revision=master&tag=model&auth_key=1775398751-ea36bac316f34073b0781529ab3b56db-0-9ca29a20fb3134cfadad1a96182ab2ff)用命令```./bin/llama-server -m /home/pnxc/下载/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf --port 8080```推理了4分钟，推理速度是0.83t/s。
+用命令```./bin/llama-server -m /data/home/pnxc/下载/gemma-4-E2B-it-UD-Q4_K_XL.gguf --port 8080```换成模型[gemma-4-E2B-it-UD-Q4_K_XL.gguf](https://cdn-lfs-cn-1.modelscope.cn/prod/lfs-objects/41/96/91b8dd007300fe1e9706a01c3400296043e94753fda8556121bab943530f?filename=gemma-4-E2B-it-UD-Q4_K_XL.gguf&namespace=unsloth&repository=gemma-4-E2B-it-GGUF&revision=master&tag=model&auth_key=1775397519-4be3b77b78ee4d1e855db1ddd4722271-0-8bee2fb4ab1a0a2611849c4f88fc9d6a)会出现思维链，思维链的推理速度是0.96t/s
+<img width="924" height="909" alt="image" src="https://github.com/user-attachments/assets/1104e9e5-fc52-4db4-ae96-4ab8da39757a" />
+
 
 > [!IMPORTANT]
 [2024 Jun 12] Binaries have been renamed w/ a `llama-` prefix. `main` is now `llama-cli`, `server` is `llama-server`, etc (https://github.com/ggerganov/llama.cpp/pull/7809)
