@@ -32,7 +32,7 @@ make -j$(nproc)
     --port 8080 \
     --ctx-size 4096
 ```
-  3A6000的推理速度如下，reading是23.02t/s，reason 是11t/s，generate 是8.37 t/s，思考模式下的速度是3A5000的8.7倍。关闭思考模式的推理速度是11.86t/d
+  3A6000的推理速度如下，reading是23.02t/s，reason 是11t/s，generate 是8.37 t/s，思考模式下的速度是3A5000的8.7倍。关闭思考模式的推理速度是11.86t/s
   
   <img width="844" height="964" alt="image" src="https://github.com/user-attachments/assets/877a8f13-b2ce-4850-8f6b-e5d0126bf5d1" />
   <img width="874" height="950" alt="image" src="https://github.com/user-attachments/assets/c51824ec-ade0-42f5-8429-a1a4dc9c0919" />
