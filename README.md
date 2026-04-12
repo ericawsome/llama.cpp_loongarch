@@ -10,7 +10,7 @@
 
 Inference of Meta's [LLaMA](https://arxiv.org/abs/2302.13971) model (and others) in pure C/C++
 > [Log]
-- 3A6000上用daoxianghu20操作系统，安装的是`g++ (Loongnix 8.3.0-6.lnd.vec.44) 8.3.0`，编译用`CMake 3.30.0-rc4`版，同样是要修改llamacpp根目录的CMakeList.txt文件来修复std::filesystem，这次用的[llama.cpp-b8763.tar.gz]((https://github.com/ggml-org/llama.cpp/archive/refs/tags/b8763.tar.gz)，CMakeList.txt要修改的地方是在第117行附近，
+- 3A6000上用daoxianghu20操作系统，安装的是`g++ (Loongnix 8.3.0-6.lnd.vec.44) 8.3.0`，编译用`CMake 3.30.0-rc4`版，同样是要修改llamacpp根目录的CMakeList.txt文件来修复std::filesystem，这次用的[llama.cpp-b8763.tar.gz](https://github.com/ggml-org/llama.cpp/archive/refs/tags/b8763.tar.gz)，CMakeList.txt要修改的地方是在第117行附近，
   <img width="1088" height="818" alt="image" src="https://github.com/user-attachments/assets/bbf1754b-8ee5-493d-b654-23977d0bbc21" />
  修改完文件就用下面的没能力编译
 ```bash
