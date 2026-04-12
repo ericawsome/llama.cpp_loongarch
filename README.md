@@ -10,7 +10,35 @@
 
 Inference of Meta's [LLaMA](https://arxiv.org/abs/2302.13971) model (and others) in pure C/C++
 > [Log]
-- 3A5000上用的daoxiagnhu20操作系统，安装的是g++ (Loongnix 8.3.0-6.lnd.vec.44) 8.3.0，编译用CMake 3.24.3版，编译成功，加载运行模型[Meta-Llama-3-8B-Instruct-Q4_K_M.gguf](https://cdn-lfs-cn-1.modelscope.cn/prod/lfs-objects/57/b2/6bac2df51111affec600077708de06133b8f49e697723672657c7cbe3b9c?filename=Meta-Llama-3-8B-Instruct-Q4_K_M.gguf&namespace=LLM-Research&repository=Meta-Llama-3-8B-Instruct-GGUF&revision=master&tag=model&auth_key=1775398751-ea36bac316f34073b0781529ab3b56db-0-9ca29a20fb3134cfadad1a96182ab2ff)成功，用命令```./bin/llama-server -m /home/pnxc/下载/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf --port 8080```启动推理速度很慢而且会卡死。2026.04.05
+- 3A6000上用daoxianghu20操作系统，安装的是`g++ (Loongnix 8.3.0-6.lnd.vec.44) 8.3.0`，编译用`CMake 3.30.0-rc4`版，同样是要修改llamacpp根目录的CMakeList.txt文件来修复std::filesystem，这次用的[llama.cpp-b8763.tar.gz]((https://github.com/ggml-org/llama.cpp/archive/refs/tags/b8763.tar.gz)，CMakeList.txt要修改的地方是在第117行附近，
+  <img width="1088" height="818" alt="image" src="https://github.com/user-attachments/assets/bbf1754b-8ee5-493d-b654-23977d0bbc21" />
+ 修改完文件就用下面的没能力编译
+```bash
+cd build
+rm -rf *   # 清空 build 目录
+cmake ..
+make -j$(nproc)
+```
+编译后可以用下面两个来看下有没有正常输出，有正常输出那就编译成功了可以用后面的命令快速加载模型来测试推理速度。
+```bash
+./bin/llama-server -h
+./bin/llama-cli -h
+
+~/下载/llamacpp/llama.cpp-b8763/build/bin/llama-server \
+    --model ~/下载/Gemma4/gemma-4-E2B-it-Q4_K_M.gguf \
+    --mmproj ~/下载/Gemma4/Gemma-4-E2B-it-GGUF-mmproj-F16.gguf \
+    --chat-template-kwargs '{"enable_thinking": false}' \
+    --host 0.0.0.0 \
+    --port 8080 \
+    --ctx-size 4096
+```
+  3A6000的推理速度如下，reading是23.02t/s，reason 是11t/s，generate 是8.37 t/s，思考模式下的速度是3A5000的8.7倍。关闭思考模式的推理速度是11.86t/d
+  
+  <img width="844" height="964" alt="image" src="https://github.com/user-attachments/assets/877a8f13-b2ce-4850-8f6b-e5d0126bf5d1" />
+  <img width="874" height="950" alt="image" src="https://github.com/user-attachments/assets/c51824ec-ade0-42f5-8429-a1a4dc9c0919" />
+
+
+- 3A5000上用的daoxiagnhu20操作系统，安装的是`g++ (Loongnix 8.3.0-6.lnd.vec.44) 8.3.0，`编译用`CMake 3.24.3`版，编译成功，加载运行模型[Meta-Llama-3-8B-Instruct-Q4_K_M.gguf](https://cdn-lfs-cn-1.modelscope.cn/prod/lfs-objects/57/b2/6bac2df51111affec600077708de06133b8f49e697723672657c7cbe3b9c?filename=Meta-Llama-3-8B-Instruct-Q4_K_M.gguf&namespace=LLM-Research&repository=Meta-Llama-3-8B-Instruct-GGUF&revision=master&tag=model&auth_key=1775398751-ea36bac316f34073b0781529ab3b56db-0-9ca29a20fb3134cfadad1a96182ab2ff)成功，用命令```./bin/llama-server -m /home/pnxc/下载/Meta-Llama-3-8B-Instruct-Q4_K_M.gguf --port 8080```启动推理速度很慢而且会卡死。2026.04.05
 - 尝试编译最新的[llama.cpp-b8665](https://github.com/ggml-org/llama.cpp/archive/refs/tags/b8665.tar.gz)，需要修改CMakeList.txt的第191行代码加入以下内容
 ```
 # Fix std::filesystem linking for GCC < 9 (needed for loongarch with GCC 8.3)
